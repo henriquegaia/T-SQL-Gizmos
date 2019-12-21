@@ -1,0 +1,3 @@
+regex
+https://www.red-gate.com/simple-talk/sql/sql-training/regex-based-finding-and-replacing-of-text-in-ssms/
+--------------------------------------------------------------------------------

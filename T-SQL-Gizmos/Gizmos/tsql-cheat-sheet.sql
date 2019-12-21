@@ -57,4 +57,27 @@ exec sp_MSforeachdb 'use [?]
 	where 
 		o.type_desc = ''USER_TABLE'' and
 		i.type_desc = ''HEAP'''
-
+--------------------------------------------------------------------------------
+-- Number of 8K Pages Used by a Table and/or Database
+select 
+    t.name as Tablename,
+    p.rows as RowCounts,
+    sum(a.total_pages) as TotalPages, 
+    sum(a.used_pages) as UsedPages, 
+    (sum(a.total_pages) - sum(a.used_pages)) as UnusedPages
+from 
+    sys.tables t
+inner join      
+    sys.indexes i on t.object_id = i.object_id
+inner join 
+    sys.partitions p on i.object_id = p.object_id and i.index_id = p.index_id
+inner join 
+    sys.allocation_units a on p.partition_id = a.container_id
+where 
+    t.name not like 'dt%' 
+    and t.is_ms_shipped = 0
+    and i.object_id > 255 
+group by 
+    t.name, p.rows
+order by 
+    t.name
