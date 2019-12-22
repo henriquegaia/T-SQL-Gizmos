@@ -115,7 +115,7 @@ go
 select * from users where Reputation = 3;
 go
 
-select * from sys.database_audit_specification_details 
+
 
 
 
