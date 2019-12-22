@@ -1,3 +1,5 @@
 regex
 https://www.red-gate.com/simple-talk/sql/sql-training/regex-based-finding-and-replacing-of-text-in-ssms/
 --------------------------------------------------------------------------------
+scripts
+https://www.red-gate.com/simple-talk/sql/t-sql-programming/top-10-most-common-database-scripts/

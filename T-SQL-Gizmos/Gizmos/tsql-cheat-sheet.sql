@@ -1,7 +1,7 @@
 use Foo;
 --------------------------------------------------------------------------------
 -- For every single index on an object get seeks, scans, lookups and update
-
+--------------------------------------------------------------------------------
 declare @obj nvarchar(20) = N'Users';
 
 select 
@@ -20,6 +20,7 @@ where
 	o.name = @obj
 --------------------------------------------------------------------------------
 --
+--------------------------------------------------------------------------------
 select
 	s.name + '.' + o.name 'TableName'
 	,i.type_desc
@@ -38,6 +39,7 @@ order by
 	o.name
 --------------------------------------------------------------------------------
 -- Tables without clustered index
+--------------------------------------------------------------------------------
 select 
 	*
 from 
@@ -46,6 +48,7 @@ where
 	objectproperty(object_id(table_name), 'TableHasClustIndex') = 0
 --------------------------------------------------------------------------------
 -- Amount of tables per DB
+--------------------------------------------------------------------------------
 exec sp_MSforeachdb 'use [?] 
 	select   
 		''?'' as DatabaseName,
@@ -59,6 +62,7 @@ exec sp_MSforeachdb 'use [?]
 		i.type_desc = ''HEAP'''
 --------------------------------------------------------------------------------
 -- Number of 8K Pages Used by a Table and/or Database
+--------------------------------------------------------------------------------
 select 
     t.name as Tablename,
     p.rows as RowCounts,
@@ -81,3 +85,46 @@ group by
     t.name, p.rows
 order by 
     t.name
+go
+--------------------------------------------------------------------------------
+-- Which queries are running long and where you might be experiencing blocking
+-- v1
+--------------------------------------------------------------------------------	
+select  
+	*
+from    
+	sys.dm_exec_requests as der
+cross apply 
+	sys.dm_exec_sql_text(der.sql_handle) as dest
+cross apply 
+	sys.dm_exec_query_plan(der.plan_handle) as deqp;
+go
+--------------------------------------------------------------------------------
+-- Which queries are running long and where you might be experiencing blocking
+-- v2
+--------------------------------------------------------------------------------
+select  substring(dest.text, ( der.statement_start_offset / 2 ) + 1,
+                  ( case der.statement_end_offset
+                      when -1 then datalength(dest.text)
+                      else der.statement_end_offset
+                           - der.statement_start_offset
+                    end ) / 2 + 1) as querystatement ,
+        deqp.query_plan ,
+        der.session_id ,
+        der.start_time ,
+        der.status ,
+        db_name(der.database_id) as dbname ,
+        user_name(der.user_id) as username ,
+        der.blocking_session_id ,
+        der.wait_type ,
+        der.wait_time ,
+        der.wait_resource ,
+        der.last_wait_type ,
+        der.cpu_time ,
+        der.total_elapsed_time ,
+        der.reads ,
+        der.writes
+from    sys.dm_exec_requests as der
+        cross apply sys.dm_exec_sql_text(der.sql_handle) as dest
+        cross apply sys.dm_exec_query_plan(der.plan_handle) as deqp;
+go

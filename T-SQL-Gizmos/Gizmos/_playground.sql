@@ -106,6 +106,17 @@ order by datelog
 select id from dbo.Users
 where datelog > '20170101'
 order by datelog
+--------------------------------------------------------------------------------
+set statistics io on
+select * from users where Reputation = 1;
+go
+select * from users where Reputation = 2;
+go
+select * from users where Reputation = 3;
+go
+
+select * from sys.database_audit_specification_details 
+
 
 
 
