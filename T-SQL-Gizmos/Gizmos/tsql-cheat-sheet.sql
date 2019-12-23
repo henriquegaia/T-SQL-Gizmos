@@ -128,3 +128,10 @@ from    sys.dm_exec_requests as der
         cross apply sys.dm_exec_sql_text(der.sql_handle) as dest
         cross apply sys.dm_exec_query_plan(der.plan_handle) as deqp;
 go
+--------------------------------------------------------------------------------
+-- Which queries are running long and where you might be experiencing blocking
+-- v2
+--------------------------------------------------------------------------------
+select job_id,last_executed_step_id
+ from msdb.dbo.sysjobactivity
+ where last_executed_step_id is not null

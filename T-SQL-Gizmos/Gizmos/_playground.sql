@@ -114,9 +114,29 @@ select * from users where Reputation = 2;
 go
 select * from users where Reputation = 3;
 go
-
-
-
-
-
-
+--------------------------------------------------------------------------------
+alter table users
+	drop constraint UNQ_Id
+go
+--------------------------------------------------------------------------------
+alter table users 
+	add constraint UNQ_Id
+	unique (Id);
+go
+--------------------------------------------------------------------------------
+create unique index IX_Id_not_null
+	on users(Id) where id is not null
+go
+--------------------------------------------------------------------------------
+insert into users (Id, Name, Guid, DateLog, Reputation) values
+	(null,'DE', newid(), getdate(), 3)
+go
+--------------------------------------------------------------------------------
+alter table users2
+	add constraint FK_Users2_Users
+	foreign key(id)
+	references users(id)
+--------------------------------------------------------------------------------
+insert into users (Id, Name, Guid, DateLog, Reputation) values
+	(99999,'DE', newid(), getdate(), 3)
+go

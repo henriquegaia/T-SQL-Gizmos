@@ -25,6 +25,18 @@
           <AssociatedConnUserName />
           <FullPath>_playground.sql</FullPath>
         </FileNode>
+        <FileNode Name="stuff-to-try.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(LocalDb)\MSSQLLocalDB:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>(LocalDb)\MSSQLLocalDB</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>stuff-to-try.sql</FullPath>
+        </FileNode>
+        <FileNode Name="to-investigate.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(LocalDb)\MSSQLLocalDB:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>(LocalDb)\MSSQLLocalDB</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>to-investigate.sql</FullPath>
+        </FileNode>
         <FileNode Name="tsql-cheat-sheet.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:(LocalDb)\MSSQLLocalDB:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>(LocalDb)\MSSQLLocalDB</AssociatedConnSrvName>
