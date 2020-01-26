@@ -1,142 +1,87 @@
 --playground
 
-set statistics io on
-
--- 1/5
 use foo
 --set statistics io on
 --set statistics time on
 
--- pages used by table
---dbcc ind('foo', Users, -1 )
+--exec sp_blitzcache 
+--	  @databaseName = 'foo'
+--	--, @SortOrder = 'recent compilations'
+--	-- reads, cpu, duration, executions,xpm, memory grant, recent compilations
+--	--, @Top = 3
+--	--, @expertMode = 1
+--	--, exportToExcel = 1
+--	, @outputDatabaseName = 'Foo'
+--	, @outputSchemaName = 'dbo'
+--	, @outputTableName = 'BlitzCacheResults'
+--	--@help = 1
 
--- see contents of page 
---dbcc traceon(3604)
---dbcc page('foo', 1, 4 , 3)
---dbcc traceoff(3604)
+--exec sp_BlitzIndex 
+	--@GetAllDatabases = 1
+	--@mode = 4
+	--@bringThePain = 1
+	--@help = 1
 
---select * from Users
---where id = 3
+use AdventureWorks2016
+exec sp_BlitzFirst
+	--@expertMode= 1
+	@sinceStartUp = 1
+--------------------------------------------------------------------------------
+/*
+--deadlock tests
+DBCC TRACEON (1222,-1)
+DBCC TRACESTATUS (1222)
 
--- see cols used by all indexes on table
---alter table users
---add [Guid] UNIQUEIDENTIFIER primary key default NEWID()
+DBCC TRACEOFF (1222,-1)
+DBCC TRACESTATUS (1222)
 
---------------------------------------------------------------------------------
--- 1
---select id from users
---2
-select id from Users
-where guid like '%a%'
---3
-select id from Users
-where guid like '%a%'
-order by id
---4
-select * from dbo.Users
---where guid like N'%a%'
-order by id
+SELECT * FROM SYS.DATABASES
 
---dbcc show_statistics('dbo.users', 'id')
+use foo 
 
-select * from sys.objects where name like 'users%'
+begin tran
+update users set Name = 'a' where id = 1
+commit tran
 
-drop table if exists dbo.Users2;
-select * into dbo.Users2 from dbo.Users
---------------------------------------------------------------------------------
---set statistics io on
-set statistics time on
-declare @t table (Id int ,Val varchar(100))
-insert into @t values (1,'brent'), (2,'hrm'), (3,'kendra')
-select * from @t option(recompile)
-go
---------------------------------------------------------------------------------
-drop table #t2
-create table #t2 (Id int ,Val varchar(100))
-insert into #t2 values (1,'brent'), (2,'hrm'), (3,'kendra')
-select * from #t2 
-go
---------------------------------------------------------------------------------
-drop index if exists IX_DateLog_Id on Users
-set statistics io on
-select id, name from dbo.Users
-where datelog > '20170101'
-order by datelog
---0.014677
---------------------------------------------------------------------------------
-create index IX_DateLog_Id on Users(DateLog, Id)
-set statistics io on
-select id, [name] from dbo.Users
-where datelog > '20170101'
-order by datelog
---0.014677
---------------------------------------------------------------------------------
---declare @n int = 462
---declare @name char(2) 
---while @n <> 1000 
---begin
---	set @name = char((rand()*25 + 65))+char((rand()*25 + 65))
---	insert into Users(Id, Name, Guid, DateLog) values
---	(@n, @name, newid(), getdate())
---	set @n = @n + 1
---end
---------------------------------------------------------------------------------
---declare @FromDate date = '01/01/2017'
---declare @ToDate date = '30/11/2019'
+begin tran
+update users2 set Name = 'a' where id = 1
+commit tran
 
-select convert(	datetime2,
-				dateadd(day, 
-					rand(checksum(newid()))*(1+datediff(day, @FromDate, @ToDate)), 
-					@FromDate),
-				103);
+select * from users where id =1
+select * from users2 where id =1
+*/
+use foo
+--session 1
+begin tran
+update users 
+set datelog='20170102'
+where year(datelog)=2019
+--commit tran
 
---update users
---set DateLog = convert(	datetime2,
---						dateadd(day, 
---						   rand(checksum(newid()))*(1+datediff(day, @FromDate, @ToDate)), 
---						   @FromDate),
---						103);
---------------------------------------------------------------------------------
-create index IX_DateLog_Id_Name on Users(DateLog, Id) include ([Name])
---set statistics io on
-select id, [name] from dbo.Users
-where datelog > '20170101'
-order by datelog
---------------------------------------------------------------------------------
-select id from dbo.Users
-where datelog > '20170101'
-order by datelog
---------------------------------------------------------------------------------
-set statistics io on
-select * from users where Reputation = 1;
-go
-select * from users where Reputation = 2;
-go
-select * from users where Reputation = 3;
-go
---------------------------------------------------------------------------------
-alter table users
-	drop constraint UNQ_Id
-go
---------------------------------------------------------------------------------
-alter table users 
-	add constraint UNQ_Id
-	unique (Id);
-go
---------------------------------------------------------------------------------
-create unique index IX_Id_not_null
-	on users(Id) where id is not null
-go
---------------------------------------------------------------------------------
-insert into users (Id, Name, Guid, DateLog, Reputation) values
-	(null,'DE', newid(), getdate(), 3)
-go
---------------------------------------------------------------------------------
-alter table users2
-	add constraint FK_Users2_Users
-	foreign key(id)
-	references users(id)
---------------------------------------------------------------------------------
-insert into users (Id, Name, Guid, DateLog, Reputation) values
-	(99999,'DE', newid(), getdate(), 3)
-go
+--session 2
+select * from users 
+where year(datelog)=2019
+
+use foo
+exec dbo.sp_WhoIsActive @get_locks = 1
+/*
+<Database name="Foo">
+  <Locks>
+    <Lock request_mode="S" request_status="GRANT" request_count="1" />
+  </Locks>
+  <Objects>
+    <Object name="Users" schema_name="dbo">
+      <Locks>
+        <Lock resource_type="KEY" index_name="IX_DateLog_Id"				request_mode="X" request_status="GRANT" request_count="1192" />
+        <Lock resource_type="KEY" index_name="IX_DateLog_Id_Name"			request_mode="X" request_status="GRANT" request_count="1192" />
+        <Lock resource_type="KEY" index_name="PK__Users__A2B5777C4DAFCFAB"	request_mode="X" request_status="GRANT" request_count="596" />
+        <Lock resource_type="OBJECT" request_mode="IX" request_status="GRANT" request_count="1" />
+        <Lock resource_type="PAGE" page_type="*" index_name="IX_DateLog_Id"					request_mode="IX" request_status="GRANT" request_count="8" />
+        <Lock resource_type="PAGE" page_type="*" index_name="IX_DateLog_Id_Name"			request_mode="IX" request_status="GRANT" request_count="9" />
+        <Lock resource_type="PAGE" page_type="*" index_name="PK__Users__A2B5777C4DAFCFAB"	request_mode="IX" request_status="GRANT" request_count="5" />
+      </Locks>
+    </Object>
+  </Objects>
+</Database>
+*/
+

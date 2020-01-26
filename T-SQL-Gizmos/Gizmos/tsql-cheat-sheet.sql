@@ -132,6 +132,51 @@ go
 -- Which queries are running long and where you might be experiencing blocking
 -- v2
 --------------------------------------------------------------------------------
-select job_id,last_executed_step_id
- from msdb.dbo.sysjobactivity
- where last_executed_step_id is not null
+select	job_id,last_executed_step_id
+from	msdb.dbo.sysjobactivity
+where	last_executed_step_id is not null
+ --------------------------------------------------------------------------------
+-- Identify Collation for a SQL Server database
+--------------------------------------------------------------------------------
+declare @databasename as sysname
+set		@databasename = 'adventureworks2016'
+select	db_name(db_id(@databasename)) as databasename
+		,databasepropertyex(@databasename, 'collation') as collationusedbysqlserverdatabase
+go
+--------------------------------------------------------------------------------
+-- Collation used by all the databases on a SQL Server instance 
+--------------------------------------------------------------------------------
+use		master
+go
+select	name, 
+		collation_name
+from	sys.databases
+order by database_id asc
+go
+--------------------------------------------------------------------------------
+-- Identify SQL Server Collation Settings
+--------------------------------------------------------------------------------
+use		master
+go
+select	serverproperty('collation') as sqlservercollation
+go
+--------------------------------------------------------------------------------
+-- Forcing a lock 
+--------------------------------------------------------------------------------
+-- session 1
+
+begin tran
+	update	users	with(tablock) -- or tablockx
+	set		datelog ='20171111'
+	where	id=1 
+	waitfor delay '00:02:00'
+rollback tran 
+go
+-- session 2
+update	users
+set		datelog='20171112'
+where	id=1 
+-- on any session, check xml on field 'locks'
+exec sp_WhoIsActive 
+	@get_locks = 1
+
