@@ -179,4 +179,13 @@ where	id=1
 -- on any session, check xml on field 'locks'
 exec sp_WhoIsActive 
 	@get_locks = 1
+--------------------------------------------------------------------------------
+-- Ordering first by non null values, and then by null values
+--------------------------------------------------------------------------------
+select		id, [name] 
+from		users 
+order by	case 
+				when [name] is null then 1
+				else 0
+			end, [name]
 
