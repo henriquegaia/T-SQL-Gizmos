@@ -1,4 +1,4 @@
---playground
+--playground!
 
 use foo
 --set statistics io on
