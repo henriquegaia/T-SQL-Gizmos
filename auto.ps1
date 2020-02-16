@@ -12,8 +12,8 @@ Write-Host '==> conflicts: ' $CONFLICTS
 if ( $CONFLICTS -gt 0 ) {	
 	[console]::ForegroundColor = "red"
 	[console]::BackgroundColor = "black"
-	echo "There is a merge conflict. Aborting ..."
-	git merge --abort
+	echo "There is a merge conflict."
+	#git merge --abort
 }else{
 	git push origin master
 	[console]::ForegroundColor = "green"
