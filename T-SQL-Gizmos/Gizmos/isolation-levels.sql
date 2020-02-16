@@ -152,7 +152,7 @@ begin tran
 	select * from users where id = 1
 
 /* !! NO BLOCKING */
--- the data retrieved is of the time the transaction started
+-- the data retrieved is of the time the transaction started;
 
 -- conn1
 commit tran

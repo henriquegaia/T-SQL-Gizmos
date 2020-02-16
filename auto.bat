@@ -1,2 +1,2 @@
-call git add . 
+git add . 
 call git commit -m "Blah"
