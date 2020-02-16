@@ -1,3 +1,6 @@
+[console]::ForegroundColor = "white"
+[console]::BackgroundColor = "black"
+
 git add .
 git commit -m "Blah"
 git pull origin master

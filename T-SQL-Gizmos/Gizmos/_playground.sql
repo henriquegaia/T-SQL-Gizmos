@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 --playground?
+=======
+--playground!
+>>>>>>> 2ac4232d3bb905902efdf1404708f1714400ce1d
 
 use foo
 --set statistics io on
