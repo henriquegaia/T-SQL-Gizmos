@@ -1,5 +1,5 @@
 [console]::ForegroundColor = "white"
-[console]::BackgroundColor = "black"
+[console]::BackgroundColor = "blue"
 
 git add .
 git commit -m "Blah"
