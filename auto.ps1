@@ -2,7 +2,7 @@ git add .
 git commit -m "Blah"
 git pull origin master
 
-$CONFLICTS = (git ls-files -u | wc -l)
+$CONFLICTS = (git ls-files -u | Measure-Object -line).Lines
 
 [console]::ForegroundColor = "yellow"
 [console]::BackgroundColor = "black"
