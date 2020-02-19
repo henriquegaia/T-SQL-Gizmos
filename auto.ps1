@@ -1,3 +1,5 @@
+cd C:\Users\henri\github\t-sql-gizmos
+
 git add .
 git commit -m "Blah"
 git pull origin master
